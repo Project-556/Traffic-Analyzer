@@ -1,0 +1,11 @@
+{
+   "alerts": {
+      "rules": "None",
+      "severity": "LOW",
+      "message": "[TrafficWall] No threats detected \u2714",
+      "score": 0
+   },
+   "decision": "ALLOW",
+   "explain": null,
+   "error": null
+}

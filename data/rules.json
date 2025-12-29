@@ -1,0 +1,8 @@
+[
+  {
+    "name": "Unusual Port",
+    "description": "Flag connections to ports > 1024",
+    "port_range": [1, 1024],
+    "severity": "HIGH"
+  }
+]

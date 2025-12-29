@@ -1,0 +1,4 @@
+[
+  {"source_ip": "192.168.1.5", "dest_ip": "10.0.0.5", "port": 1020, "protocol": "TCP"},
+  {"source_ip": "192.168.1.6", "dest_ip": "10.0.0.8", "port": 1020, "protocol": "FTP"}
+]
