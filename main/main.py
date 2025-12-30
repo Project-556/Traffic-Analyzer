@@ -6,13 +6,22 @@ from dotenv import load_dotenv
 import sys
 from time import time
 
+parser = argparse.ArgumentParser(description="Traffic Wall")
+parser.add_argument("--input", required=True, help="Path to sample_logs.json")
+parser.add_argument("--explain", action="store_true", help="AI explanation")
+parser.add_argument("--fast-demo", action="store_true", help="Optimized demo mode")
+parser.add_argument("--returns" ,action="store_true", help="Returnn Output")
+args = parser.parse_args()
 
+returning = args.returns
 def mark(label):
-    print(f"[{time():.2f}] {label}", flush=True)
+    global returning
+    if not returning:
+        print(f"[{time():.2f}] {label}", flush=True)
 
 mark("Program start")
 #-------------------- OUTPUT CONFIG -----------------
-sys.stdout.reconfigure(line_buffering=True)
+sys.stdout.reconfigure(line_buffering=True, encoding="utf-8")
 
 # -------------------- ENV SETUP --------------------
 load_dotenv()
@@ -80,6 +89,7 @@ def print_alert(alert: dict):
 
 
 def generate_explanation(alert: dict) -> str:
+    global returning
     print("[TrafficWall] Generating AI explanation...")
 
     response = client.models.generate_content(
@@ -107,21 +117,16 @@ def generate_explanation(alert: dict) -> str:
 
 # -------------------- MAIN --------------------
 def main():
+    global returning
     mark("Entered main()")
-    parser = argparse.ArgumentParser(description="Traffic Wall")
-    parser.add_argument("--input", required=True, help="Path to sample_logs.json")
-    parser.add_argument("--explain", action="store_true", help="AI explanation")
-    parser.add_argument("--fast-demo", action="store_true", help="Optimized demo mode")
-    parser.add_argument("--return" ,action="store_true", help="Returnn Output")
-    args = parser.parse_args()
 
     # ---------- Load rules ----------
-    print("[TrafficWall] Loading detection rules...")
+    mark("[TrafficWall] Loading detection rules...")
     rules = load_rules(RULES_PATH)
-    print("[TrafficWall] Rules loaded ✔")
+    mark("[TrafficWall] Rules loaded ✔")
 
     # ---------- Load logs ----------
-    print("[TrafficWall] Reading input logs...", flush=True)
+    mark("[TrafficWall] Reading input logs...")
     try:
         with open(args.input, "r") as f:
             logs = json.load(f)
@@ -129,27 +134,29 @@ def main():
         print(f"[ERROR] Failed to load input file: {e}")
         output["error"] = f"[ERROR] Failed to load input file: {e}"
         return
+    except Exception.with_traceback as e:
+        print("Something occured: ", e)
 
     if args.fast_demo:
         logs = logs[:20]
-        print("[TrafficWall] Fast-demo mode enabled (limited dataset)", flush=True)
+        mark("[TrafficWall] Fast-demo mode enabled (limited dataset)")
 
-    print(f"[TrafficWall] Logs loaded: {len(logs)} entries", flush=True)
+    mark(f"[TrafficWall] Logs loaded: {len(logs)} entries")
 
     # ---------- Analyze ----------
-    print("[TrafficWall] Running traffic analysis...", flush=True)
+    mark("[TrafficWall] Running traffic analysis...")
     alerts = analyze(logs, rules)
 
     if not alerts:
-        print("[TrafficWall] No threats detected ✔", flush=True)
-        alert = {"rules": "None",
-                 "severity": "LOW",
-                 "message": "[TrafficWall] No threats detected ✔",
-                 "score": 0}
-        output["alerts"] = alert
-        output["decision"] = "ALLOW"
-        with open(OUTPUT_FILE, "w") as f:
-            json.dump(output, f, indent=3)
+        output_data = {
+            "alerts": [],
+            "final_score": 0,
+            "decision": "ALLOW",
+            "explain": None,
+            "error": None
+        }
+        if args.returns:
+            print(json.dumps(output_data))
         return
 
     output_data = {
@@ -164,7 +171,7 @@ def main():
 
     # ---------- Process alerts ----------
     for idx, alert in enumerate(alerts, start=1):
-        print(f"[TrafficWall] Processing alert {idx}/{len(alerts)}", flush=True)
+        mark(f"[TrafficWall] Processing alert {idx}/{len(alerts)}", flush=True)
 
         severity = alert["severity"].lower()
         score = SEVERITY_SCORE.get(severity, 0)
@@ -179,15 +186,16 @@ def main():
             "action": action
         }
 
-        print_alert(alert_obj)
+        if not args.returns:
+            print_alert(alert_obj)
 
         total_score += score
         output_data["alerts"].append(alert_obj)
 
         if args.explain:
             explanation = generate_explanation(alert_obj)
-            print("\n[AI Explanation]")
-            print(explanation)
+            mark("\n[AI Explanation]")
+            mark(explanation)
             output_data["explain"] = explanation
 
     # ---------- Final decision ----------
@@ -199,15 +207,27 @@ def main():
     with open(OUTPUT_FILE, "w") as f:
         json.dump(output_data, f, indent=3)
 
-    print("\n[TrafficWall] Analysis complete ✔", flush=True)
-    print("Final Decision:", output_data["decision"], flush=True)
+    # ---------- Final decision ----------
+    output_data["final_score"] = total_score
+    output_data["decision"] = decide_action(total_score)
+
+    # ---------- Save output ----------
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
     with open(OUTPUT_FILE, "w") as f:
-        json.dump(output, f, indent=3)
-    if args.returns:
-        return output
+        json.dump(output_data, f, indent=3)
+
+    # ---------- Machine output ----------
+    if not args.returns:
+        print(json.dumps(output_data))
+        return
+
+    # ---------- Human output ----------
+    mark("\n[TrafficWall] Analysis complete ✔")
+    mark(f"Final Decision: {output_data["decision"]}")
+
 
 
 # -------------------- ENTRY --------------------
 if __name__ == "__main__":
-    print("[TrafficWall] Initializing analysis engine...", flush=True)
+    mark("[TrafficWall] Initializing analysis engine...")
     main()
