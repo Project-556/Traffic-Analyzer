@@ -13,10 +13,8 @@ parser.add_argument("--fast-demo", action="store_true", help="Optimized demo mod
 parser.add_argument("--returns" ,action="store_true", help="Returnn Output")
 args = parser.parse_args()
 
-returning = args.returns
 def mark(label):
-    global returning
-    if not returning:
+    if not args.returns:
         print(f"[{time():.2f}] {label}", flush=True)
 
 mark("Program start")
@@ -171,7 +169,7 @@ def main():
 
     # ---------- Process alerts ----------
     for idx, alert in enumerate(alerts, start=1):
-        mark(f"[TrafficWall] Processing alert {idx}/{len(alerts)}", flush=True)
+        mark(f"[TrafficWall] Processing alert {idx}/{len(alerts)}")
 
         severity = alert["severity"].lower()
         score = SEVERITY_SCORE.get(severity, 0)
@@ -217,7 +215,7 @@ def main():
         json.dump(output_data, f, indent=3)
 
     # ---------- Machine output ----------
-    if not args.returns:
+    if args.returns:
         print(json.dumps(output_data))
         return
 

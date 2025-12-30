@@ -2,7 +2,7 @@
 import subprocess
 import json
 import time
-import threading
+from threading import Thread
 from sys import executable
 
 from textual.app import App, ComposeResult
@@ -12,12 +12,13 @@ from textual.widgets import (
     Static,
     DataTable,
     ProgressBar,
+    Input,
+    Button,
 )
 from textual.containers import Horizontal, Vertical
 
 
 ENGINE_PATH = "main/main.py"
-LOG_FILE = "data/sample_logs.json"
 output: dict
 
 
@@ -37,6 +38,9 @@ class TrafficWallApp(App):
         padding: 1;
     }
     """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._running = False
 
     # (left as-is, even though unused)
     with open("data/output.json", "r") as f:
@@ -46,6 +50,15 @@ class TrafficWallApp(App):
         yield Header(show_clock=True)
 
         yield Static("🚨 TrafficWall — Security Dashboard", id="title")
+
+        self.file_input = Input(
+            placeholder="Add JSON log file path",
+            value="data/sample_logs.json"
+        )
+        yield self.file_input
+
+        self.run = Button("Run Analysis", id="run")
+        yield self.run
 
         self.progress = ProgressBar(total=100)
         yield self.progress
@@ -63,11 +76,23 @@ class TrafficWallApp(App):
 
         yield Footer()
 
-    def on_mount(self):
-        thread = threading.Thread(target=self.run_engine, daemon=True)
-        thread.start()
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "run":
+            path = self.file_input.value.strip()
+            if not path.endswith(".json"):
+                self.details.update("Exception: Provided file is not JSON")
+                return
+            self.reset_ui()
+            Thread(target=self.run_engine,args=(path,), daemon=True).start()
 
-    def run_engine(self):
+    def reset_ui(self):
+        self.progress.update(progress=0)
+        self.alert_table.clear()
+        self.details.update("Running analysis…")
+        self.decision.update("Final Decision: —")
+
+
+    def run_engine(self, LogFile):
         # Fake progress while engine runs
         for _ in range(30):
             time.sleep(0.05)
@@ -79,7 +104,7 @@ class TrafficWallApp(App):
                     executable,
                     ENGINE_PATH,
                     "--input",
-                    LOG_FILE,
+                    LogFile,
                     "--return",
                 ],
                 capture_output=True,
