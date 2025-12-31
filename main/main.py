@@ -87,8 +87,8 @@ def print_alert(alert: dict):
 
 
 def generate_explanation(alert: dict) -> str:
-    global returning
-    print("[TrafficWall] Generating AI explanation...")
+    if not args.returns:
+        print("[TrafficWall] Generating AI explanation...")
 
     response = client.models.generate_content(
         model="gemini-2.5-flash",
@@ -134,12 +134,19 @@ def main():
         return
     except Exception.with_traceback as e:
         print("Something occured: ", e)
-
+    
+    
     if args.fast_demo:
         logs = logs[:20]
         mark("[TrafficWall] Fast-demo mode enabled (limited dataset)")
 
     mark(f"[TrafficWall] Logs loaded: {len(logs)} entries")
+    total = len(logs)
+
+    """for i, log in enumerate(logs, start=0):
+        print(f"[Progress] {i}/{total}", flush=True)
+    print(logs)"""
+
 
     # ---------- Analyze ----------
     mark("[TrafficWall] Running traffic analysis...")
