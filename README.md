@@ -16,7 +16,7 @@ This approach ensures transparency and simplicity while providing essential secu
 
 ---
 
-## Core Features (Locked for Day 1)
+## Core Features
 - Rule-based detection (max 5 rules)
 - CLI-based usage
 - JSON-based rule definitions
