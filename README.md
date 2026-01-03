@@ -37,19 +37,22 @@ This approach ensures transparency and simplicity while providing essential secu
 
 ## Folder Structure
 traffic_guard/<br>
-├── main.py<br>
-├── rules/<br>
-│ └── rules.json<br>
-├── data/<br>
+├── main<br>
+│ └── main.py<br>
+│ └── GUI.py<br>
+│ └── docs.md<br>
+├── data<br>
+│ └── output.json<br>
 │ └── sample_logs.json<br>
+│ └── rules.json
 └── README.md<br>
-
+└── LICENSE.txt<br>
 ---
 
 # Tech Stack
 - **Language**: Python 3.14
-- **Framework**: Textual , Rich
-- **AI**: Google Gemini API (google-genai) 
+- **Framework**: Tkinter
+- **AI**: Google Gemini API (google-genai)
 
 ## Note
-This project is being developed **during the TechSprint hackathon**, following all rules for online participation. Detection is deterministic and rule-based; Google Gemini will only be used to generate human-readable explanations for alerts.
+This project is being developed **during the TechSprint hackathon**, following all rules for online participation. Detection is deterministic and rule-based; Google Gemini will only be used to generate easily-readable explanations for alerts if host is online.

@@ -1,7 +1,7 @@
 {
    "alerts": [
       {
-         "rule": "Unknown",
+         "type": "Unknown",
          "severity": "high",
          "message": "Unusual Port detected: port 4444 from 192.168.1.5",
          "score": 90,
@@ -10,6 +10,6 @@
    ],
    "final_score": 90,
    "decision": "BLOCK",
-   "explain": null,
+   "explain": "Server Down. Internet Went Dark",
    "error": null
 }

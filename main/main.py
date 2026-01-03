@@ -36,7 +36,6 @@ SEVERITY_SCORE = {
 }
 
 RULES_PATH = "data/rules.json"
-OUTPUT_DIR = "data/output"
 OUTPUT_FILE = "data/output.json"
 output: dict
 with open(OUTPUT_FILE, "r") as f:
@@ -79,7 +78,7 @@ def decide_action(score: int) -> str:
 
 def print_alert(alert: dict):
     print("\n[!] ALERT DETECTED")
-    print(f"Rule     : {alert['rule']}")
+    print(f"Type     : {alert['type']}")
     print(f"Severity : {alert['severity'].upper()}")
     print(f"Score    : {alert['score']}")
     print(f"Action   : {alert['action']}")
@@ -89,32 +88,36 @@ def print_alert(alert: dict):
 def generate_explanation(alert: dict) -> str:
     if not args.returns:
         print("[TrafficWall] Generating AI explanation...")
-
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=f"""
-        You are a cybersecurity analysis assistant.
-
-        Explain WHY this security alert was triggered.
-
-        Rules:
-        - Simple language
-        - No assumptions
-        - Under 4 sentences
-        - Beginner SOC analyst level
-
-        Alert:
-        Rule: {alert['rule']}
-        Severity: {alert['severity']}
-        Message: {alert['message']}"""
-            )
     
-    output["explain"] = response.text
-    return response.text
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=f"""
+            You are a cybersecurity analysis assistant.
+
+            Explain WHY this security alert was triggered.
+
+            Rules:
+            - Simple language
+            - No assumptions
+            - Under 4 sentences
+            - Beginner SOC analyst level
+
+            Alert:
+            Type: {alert['type']}
+            Severity: {alert['severity']}
+            Message: {alert['message']}"""
+                )
+        
+        output["explain"] = response.text
+        return response.text
+    except:
+        output["explain"] = "Server Down. Internet Went Dark"
+        return output["explain"]
 
 
 # -------------------- MAIN --------------------
-def main():
+def main(call: bool):
     global returning
     mark("Entered main()")
 
@@ -129,11 +132,11 @@ def main():
         with open(args.input, "r") as f:
             logs = json.load(f)
     except Exception as e:
-        print(f"[ERROR] Failed to load input file: {e}")
+        mark(f"[ERROR] Failed to load input file: {e}")
         output["error"] = f"[ERROR] Failed to load input file: {e}"
         return
     except Exception.with_traceback as e:
-        print("Something occured: ", e)
+        mark("Something occured: ", e)
     
     
     if args.fast_demo:
@@ -184,7 +187,7 @@ def main():
 
         output["decision"] = action
         alert_obj = {
-            "rule": alert.get("rule", "Unknown"),
+            "type": alert.get("type", "Unknown"),
             "severity": severity,
             "message": alert.get("message", ""),
             "score": score,
@@ -208,7 +211,6 @@ def main():
     output_data["decision"] = decide_action(total_score)
 
     # ---------- Save output ----------
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
     with open(OUTPUT_FILE, "w") as f:
         json.dump(output_data, f, indent=3)
 
@@ -217,7 +219,6 @@ def main():
     output_data["decision"] = decide_action(total_score)
 
     # ---------- Save output ----------
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
     with open(OUTPUT_FILE, "w") as f:
         json.dump(output_data, f, indent=3)
 
@@ -229,10 +230,12 @@ def main():
     # ---------- Human output ----------
     mark("\n[TrafficWall] Analysis complete ✔")
     mark(f"Final Decision: {output_data["decision"]}")
+    if call == True:
+        return output
 
 
 
 # -------------------- ENTRY --------------------
 if __name__ == "__main__":
     mark("[TrafficWall] Initializing analysis engine...")
-    main()
+    main(False)
