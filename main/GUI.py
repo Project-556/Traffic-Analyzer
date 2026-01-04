@@ -30,7 +30,7 @@ def worker(input_text, result_queue, explain):
         # pass structured error instead of crashing UI
         result_queue.put({
             "error": True,
-            "message": f"Sorry to say but something went wrong. It was output as \n{proc.stdcerr}"
+            "message": f"Sorry to say but something went wrong. It was output as \n{proc.stderr}"
         })
         return
 
