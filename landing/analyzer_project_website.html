@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analyzer 1.0 | TechSprint Hackathon</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --accent: #38bdf8;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(180deg, #020617, var(--bg));
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 80px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: var(--muted);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 14px 28px;
+      background: var(--accent);
+      color: #020617;
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.4);
+    }
+
+    section {
+      padding: 60px 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+      color: var(--accent);
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    footer {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Analyzer 1.0</h1>
+  <p>A fast, deterministic security analyzer built for the TechSprint Hackathon. CLI-first, JSON-driven, and designed for real-world workflows.</p>
+  <a class="btn" href="#download">Download ZIP</a>
+</header>
+
+<section>
+  <div class="card">
+    <h2>What does it do?</h2>
+    <ul>
+      <li>Analyzes input files using deterministic rules</li>
+      <li>Produces structured JSON output</li>
+      <li>Optional AI-based explanation layer</li>
+      <li>Designed for CLI automation and tooling</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Why existing solutions fall short</h2>
+    <ul>
+      <li>Too slow or non-deterministic</li>
+      <li>Heavy GUIs not suited for automation</li>
+      <li>Opaque decision logic</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="grid">
+    <div class="card">
+      <h2>Architecture</h2>
+      <p>
+        Input File → Analyzer Engine → Rule Evaluation → JSON Output → (Optional GUI / AI Explanation)
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Technology</h2>
+      <ul>
+        <li>Python (CLI + Analyzer)</li>
+        <li>Deterministic rule engine</li>
+        <li>Optional GenAI explanation layer</li>
+        <li>Cross-platform design</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="download">
+  <div class="card">
+    <h2>Download</h2>
+    <p>
+      The project is distributed as a ZIP release containing all required files.
+    </p>
+    <a class="btn" href="https://github.com/Project-556/Traffic-Analyzer/releases/tag/Analyzer">Download Latest Release</a>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <h2>Credits</h2>
+    <ul>
+      <li><strong>Rachit Negi</strong> — Core architecture, analyzer engine, CLI design</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p>
+    Built for TechSprint Hackathon 2025 · <a href="https://github.com/Project-556/Traffic-Analyzer">GitHub Repository</a>
+  </p>
+</footer>
+
+</body>
+</html>
