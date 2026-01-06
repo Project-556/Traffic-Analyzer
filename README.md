@@ -7,7 +7,7 @@ A rule-based, explainable security tool that flags suspicious network activity a
 
 ## Overview
 TrafficGuard is a lightweight, rule-based security tool designed to: 
-- Detect suspicious network activity using simple, human-defined rules
+- Detect suspicious network activity using simple, pre-defined rules that can be changed
 - Explain why each alert was triggered in a clear, understandable way
 - Allow easy customization of rules through a JSON file
 - Be usable via a simple command-line interface (CLI)
